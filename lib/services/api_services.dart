@@ -106,6 +106,54 @@ Future<bool> createTaskRequest(formValues) async {
     customSuccessMessage(message: 'Successfully Task Created');
     return true;
   }else{
+    customErrorMessage(message: 'Task Creation Failed');
+    return false;
+  }
+}
+
+Future<bool> taskDeleteRequest(id) async {
+  String? token = await readUserData("token");
+  Map<String, String> requestHeaderWithToken = {"Content-Type": "application/json", "token": "$token"};
+  var url = Uri.parse("$baseUrl/deleteTask/$id");
+  var response = await http.get(url, headers: requestHeaderWithToken);
+  var resultCode = response.statusCode;
+  var resultBody = json.decode(response.body);
+  if(resultCode == 200 && resultBody["status"] == "success"){
+    customSuccessMessage(message: 'Successfully Task Delete');
+    return true;
+  }else{
+    customErrorMessage(message: 'Task Deletion Failed');
+    return false;
+  }
+}
+
+Future<List> taskCountListRequest() async{
+  String? token = await readUserData("token");
+  Map<String, String> requestHeaderWithToken = {"Content-Type": "application/json", "token": "$token"};
+  var url = Uri.parse("$baseUrl/taskStatusCount");
+  var response = await http.get(url, headers: requestHeaderWithToken);
+  var resultCode = response.statusCode;
+  var resultBody = json.decode(response.body);
+  if(resultCode == 200 && resultBody["status"] == "success"){
+    customSuccessMessage(message: 'Request Success');
+    return resultBody["data"];
+  }else{
+    return [];
+  }
+}
+
+Future<bool> taskUpdateRequest(id, status) async {
+  String? token = await readUserData("token");
+  Map<String, String> requestHeaderWithToken = {"Content-Type": "application/json", "token": "$token"};
+  var url = Uri.parse("$baseUrl/updateTaskStatus/$id/$status");
+  var response = await http.get(url, headers: requestHeaderWithToken);
+  var resultCode = response.statusCode;
+  var resultBody = json.decode(response.body);
+  if(resultCode == 200 && resultBody["status"] == "success"){
+    customSuccessMessage(message: 'Successfully Task Update');
+    return true;
+  }else{
+    customErrorMessage(message: 'Task Updated Failed');
     return false;
   }
 }

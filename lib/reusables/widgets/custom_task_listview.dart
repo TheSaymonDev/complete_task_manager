@@ -1,20 +1,39 @@
 import 'package:complete_task_manager/reusables/colors.dart';
 import 'package:complete_task_manager/reusables/styles.dart';
+import 'package:complete_task_manager/reusables/widgets/custom_blue_elevated_button.dart';
+import 'package:complete_task_manager/reusables/widgets/custom_drop_down_button.dart';
+import 'package:complete_task_manager/screens/home_screen/home_page.dart';
+import 'package:complete_task_manager/services/api_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 
-class CustomTaskListView extends StatelessWidget {
+class CustomTaskListView extends StatefulWidget {
   const CustomTaskListView({super.key, required this.taskList});
 
   final List taskList;
+
+  @override
+  State<CustomTaskListView> createState() => _CustomTaskListViewState();
+}
+
+class _CustomTaskListViewState extends State<CustomTaskListView> {
+
+  final List<String> _statusList = [
+    'New',
+    'Completed',
+    'Cancelled',
+    'Progress'
+  ];
+  String? _selectedStatus = '';
 
   @override
   Widget build(BuildContext context) {
     final myTextStyle = Theme.of(context).textTheme;
     return ListView.separated(
         itemBuilder: (context, index) {
-          final task = taskList[index];
+          final task = widget.taskList[index];
           return Card(
             elevation: 2,
             color: cardColor,
@@ -51,14 +70,15 @@ class CustomTaskListView extends StatelessWidget {
                         height: 26.h,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24.r),
-                            color: task["status"] == "New"
-                                ? Colors.blue
-                                : task["status"] == "Completed"
-                                ? Colors.green
-                                : task["status"] == "Canceled"
-                                ? Colors.red
-                                : Colors.greenAccent,),
+                          borderRadius: BorderRadius.circular(24.r),
+                          color: task["status"] == "New"
+                              ? Colors.blue
+                              : task["status"] == "Completed"
+                                  ? Colors.green
+                                  : task["status"] == "Canceled"
+                                      ? Colors.red
+                                      : Colors.greenAccent,
+                        ),
                         child: Text(
                           task["status"],
                           style: myTextStyle.titleSmall,
@@ -67,7 +87,35 @@ class CustomTaskListView extends StatelessWidget {
                       Wrap(
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.bottomSheet(Container(
+                                width: double.infinity.w,
+                                color: backgroundColor,
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                child: Column(
+                                  children: [
+                                    Gap(32.h),
+                                    CustomDropdownButton(
+                                      items: _statusList,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          _selectedStatus = newValue!;
+                                        });
+                                      },
+                                      labelText: 'Select Status',
+                                    ),
+                                    Gap(16.h),
+                                    CustomBlueElevatedButton(onPressed: ()async{
+                                      bool updateSuccess = await taskUpdateRequest(task["_id"], _selectedStatus );
+                                      if (updateSuccess == true) {
+                                        Get.offAll(const HomePage());
+                                      }
+                                    }, buttonName: 'Update'),
+                                    Gap(32.h),
+                                  ],
+                                ),
+                              ));
+                            },
                             icon: Icon(
                               Icons.edit_calendar,
                               size: 20.sp,
@@ -75,7 +123,23 @@ class CustomTaskListView extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialogBox(
+                                  context: context,
+                                  title: 'Delete',
+                                  middleText:
+                                      'Are you sure want to delete task?',
+                                  onPressedCancel: () {
+                                    Get.back();
+                                  },
+                                  onPressedConfirm: () async {
+                                    bool deleteSuccess =
+                                        await taskDeleteRequest(task["_id"]);
+                                    if (deleteSuccess == true) {
+                                      Get.offAll(const HomePage());
+                                    }
+                                  });
+                            },
                             icon: Icon(
                               Icons.delete_forever,
                               size: 20.sp,
@@ -92,6 +156,6 @@ class CustomTaskListView extends StatelessWidget {
           );
         },
         separatorBuilder: (context, index) => Gap(4.h),
-        itemCount: taskList.length);
+        itemCount: widget.taskList.length);
   }
 }

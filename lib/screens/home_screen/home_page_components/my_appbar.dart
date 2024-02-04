@@ -45,19 +45,21 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             Gap(8.w),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text(
-                  '$firstName $lastName',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(
-                  '$email',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: greyColor),
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    '$firstName $lastName',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
+                    '$email',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(color: greyColor),
+                  ),
+                ],
+              ),
             )
           ],
         ),
@@ -79,7 +81,7 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
             },
             icon: Icon(
               Icons.logout,
-              size: 25.sp,
+              size: 20.sp,
               color: buttonTextColor,
             )),
       ],

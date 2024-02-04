@@ -13,18 +13,14 @@ class NewTaskPage extends StatefulWidget {
 }
 
 class _NewTaskPageState extends State<NewTaskPage> {
-  final List<Map> _taskCount = [
-    {'title': 'New', 'count': '09'},
-    {'title': 'Completed', 'count': '10'},
-    {'title': 'Canceled', 'count': '11'},
-    {'title': 'Progress', 'count': '12'},
-  ];
 
+  List taskCountItem = [];
   bool isLoading = true;
   List taskItem = [];
 
   _callData() async {
     taskItem = await taskListRequest("New");
+    taskCountItem = await taskCountListRequest();
     if (mounted) {
       setState(() {
         isLoading = false;
@@ -51,32 +47,35 @@ class _NewTaskPageState extends State<NewTaskPage> {
           SizedBox(
             height: 60.h,
             width: double.infinity,
-            child: Row(
-              children: List.generate(
-                  _taskCount.length,
-                  (index) => Expanded(
-                          child: Padding(
-                        padding: EdgeInsets.only(right: 4.w),
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: double.infinity,
-                          decoration: decorationStyle(),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _taskCount[index]['count'],
-                                style: myTextStyle.titleLarge,
-                              ),
-                              Text(
-                                _taskCount[index]['title'],
-                                style: myTextStyle.titleSmall,
-                              ),
-                            ],
-                          ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(
+                    taskCountItem.length,
+                    (index) => Padding(
+                      padding: EdgeInsets.only(right: 4.w),
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: double.infinity,
+                        width: 80.w,
+                        decoration: decorationStyle(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              taskCountItem[index]["sum"].toString(),
+                              style: myTextStyle.titleLarge,
+                            ),
+                            Text(
+                              taskCountItem[index]["_id"],
+                              style: myTextStyle.titleSmall,
+                            ),
+                          ],
                         ),
-                      ))),
+                      ),
+                    )),
+              ),
             ),
           ),
           Gap(16.h),
